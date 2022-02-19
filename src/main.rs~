@@ -1,0 +1,29 @@
+use std::time::Duration;
+
+const CLEAR: &'static str = "\x1B[2J\x1B[H";
+
+/// Clear the screen
+fn clear() {
+    print!("{}", CLEAR);
+}
+
+struct Frame {
+    content: String,
+}
+
+type Frames = Vec<Frame>;
+
+struct Animation {
+    /// All animation frames, thats will play
+    frames: Vec<Frame>,
+
+    /// How much wait to show the next frame
+    frame_delay: u32,
+}
+
+
+fn main() {
+    let five_seconds = Duration::new(10, 0);
+
+    println!("Worked !");
+}
