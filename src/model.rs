@@ -1,5 +1,5 @@
-/// For draw on the terminal
+use crate::action::Action;
+
 pub trait Model {
-    /// Draw the frame of Model
-    fn draw(&self) -> &str;
+    fn actions(&self) -> Vec<Action>;
 }

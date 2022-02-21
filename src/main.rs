@@ -2,6 +2,7 @@ use tokio::time::{sleep, Duration};
 
 pub mod model;
 pub mod models;
+pub mod action;
 
 use model::Model;
 use models::Wellcome;
@@ -14,7 +15,7 @@ fn clear() {
 }
 
 #[derive(Debug)]
-struct Frame {
+pub struct Frame {
     /// Content of Frame
     content: String,
 }
@@ -25,11 +26,6 @@ impl Frame {
 	    content: String::new(),
 	}
     }
-
-    /// Push model to Frame content
-    fn push_model(&mut self, model: &dyn Model) -> () {
-	self.content.push_str(model.draw());
-    }
 }
 
 type Frames = Vec<Frame>;
@@ -39,6 +35,7 @@ struct Animation {
     frames: Frames,
 
     /// How much wait to show the next frame
+    /// As miliseconds
     frame_delay: u64,
 }
 
@@ -55,6 +52,16 @@ impl Animation {
 	self.frames.push(frame);
     }
 
+
+    /// Push all model frames
+    fn push_model(&mut self, model: &dyn Model) -> () {
+	for action in model.actions() {
+	    for frame in action.frames {
+		self.frames.push(frame);
+	    }
+	}
+    }
+
     /// Start animation
     async fn start(&self) {
 	for frame in &self.frames {
@@ -68,13 +75,10 @@ impl Animation {
 #[tokio::main]
 async fn main() {
     clear();
-
-    let mut frame0 = Frame::new();
-    frame0.push_model(&Wellcome);
-
+    
     let mut anim = Animation::new(3000);
 
-    anim.push_frame(frame0);
+    anim.push_model(&Wellcome);
 
     anim.start().await;
 }
