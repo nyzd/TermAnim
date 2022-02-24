@@ -1,11 +1,5 @@
 use tokio::time::{sleep, Duration};
-
-pub mod model;
-pub mod models;
-pub mod action;
-
-use model::Model;
-use models::Wellcome;
+use crate::model::Model;
 
 const CLEAR: &'static str = "\x1B[2J\x1B[H";
 
@@ -17,7 +11,7 @@ fn clear() {
 #[derive(Debug)]
 pub struct Frame {
     /// Content of Frame
-    content: String,
+    pub content: String,
 }
 
 impl Frame {
@@ -28,9 +22,9 @@ impl Frame {
     }
 }
 
-type Frames = Vec<Frame>;
+pub type Frames = Vec<Frame>;
 
-struct Animation {
+pub struct Animation {
     /// All animation frames, thats will play
     frames: Frames,
 
@@ -48,13 +42,16 @@ impl Animation {
 	}
     }
 
-    fn push_frame(&mut self, frame: Frame) -> () {
+    pub fn push_frame(&mut self, frame: Frame) -> () {
 	self.frames.push(frame);
     }
 
 
     /// Push all model frames
-    fn push_model(&mut self, model: &dyn Model) -> () {
+    pub fn push_model<T>(&mut self, model: T) -> ()
+    where
+	T: Model
+    {
 	for action in model.actions() {
 	    for frame in action.frames {
 		self.frames.push(frame);
@@ -63,22 +60,13 @@ impl Animation {
     }
 
     /// Start animation
-    async fn start(&self) {
+    pub async fn start(&self) {
+	// Clear terminal to start animation
+	clear();
 	for frame in &self.frames {
 	    println!("{}", frame.content);
 	    sleep(Duration::from_millis(self.frame_delay)).await;
 	    clear();
 	}
     }
-}
-
-#[tokio::main]
-async fn main() {
-    clear();
-    
-    let mut anim = Animation::new(3000);
-
-    anim.push_model(&Wellcome);
-
-    anim.start().await;
 }

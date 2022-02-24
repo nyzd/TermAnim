@@ -1,4 +1,4 @@
-use crate::Frames;
+use crate::animation::Frames;
 
 pub struct Action {
     /// Name of Action
