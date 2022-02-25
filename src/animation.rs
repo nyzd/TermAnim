@@ -1,5 +1,6 @@
-use tokio::time::{sleep, Duration};
 use crate::model::Model;
+use std::fmt::Display;
+use tokio::time::{sleep, Duration};
 
 const CLEAR: &'static str = "\x1B[2J\x1B[H";
 
@@ -8,17 +9,19 @@ fn clear() {
     print!("{}", CLEAR);
 }
 
-#[derive(Debug)]
 pub struct Frame {
     /// Content of Frame
-    pub content: String,
+    pub content: Box<dyn Display>,
 }
 
 impl Frame {
-    pub fn new() -> Self {
-	Self {
-	    content: String::new(),
-	}
+    pub fn new<T>(content: &'static T) -> Self
+    where
+        T: Display,
+    {
+        Self {
+            content: Box::new(content),
+        }
     }
 }
 
@@ -36,37 +39,36 @@ pub struct Animation {
 impl Animation {
     /// Creates a new Animation object
     pub fn new(frame_delay: u64) -> Self {
-	Self {
-	    frames: vec![],
-	    frame_delay
-	}
+        Self {
+            frames: vec![],
+            frame_delay,
+        }
     }
 
     pub fn push_frame(&mut self, frame: Frame) -> () {
-	self.frames.push(frame);
+        self.frames.push(frame);
     }
-
 
     /// Push all model frames
     pub fn push_model<T>(&mut self, model: T) -> ()
     where
-	T: Model
+        T: Model,
     {
-	for action in model.actions() {
-	    for frame in action.frames {
-		self.frames.push(frame);
-	    }
-	}
+        for action in model.actions() {
+            for frame in action.frames {
+                self.frames.push(frame);
+            }
+        }
     }
 
     /// Start animation
     pub async fn start(&self) {
-	// Clear terminal to start animation
-	clear();
-	for frame in &self.frames {
-	    println!("{}", frame.content);
-	    sleep(Duration::from_millis(self.frame_delay)).await;
-	    clear();
-	}
+        // Clear terminal to start animation
+        clear();
+        for frame in &self.frames {
+            println!("{}", frame.content);
+            sleep(Duration::from_millis(self.frame_delay)).await;
+            clear();
+        }
     }
 }

@@ -11,9 +11,6 @@ pub struct Action {
 impl Action {
     /// Creates Action
     pub fn new(name: String, frames: Frames) -> Self {
-	Self {
-	    name,
-	    frames,
-	}
+        Self { name, frames }
     }
 }
