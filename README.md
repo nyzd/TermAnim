@@ -14,13 +14,8 @@ impl Model for Wellcome {
                 name: String::from("Intro"),
 
                 frames: vec![
-                    Frame {
-                        content: String::from("Hello world")
-                    },
-
-                    Frame {
-                        content: String::from("This is a animation")
-                    }
+                    Frame::new(&"Hello world"),
+                    Frame::new(&"TermAnim!"),
                 ]
             }
         ]
